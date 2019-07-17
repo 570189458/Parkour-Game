@@ -16,9 +16,9 @@ public class RoadSetter : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (transform.position.z > floorOnRuning.transform.position.z+32)
+        if (transform.position.z > floorOnRuning.transform.position.z+30)
         {
-            floorOnRuning.transform.position = new Vector3(0, 0, floorForword.transform.position.z + 32);
+            floorOnRuning.transform.position = new Vector3(0, 0, floorForword.transform.position.z + 30);
             GameObject t = floorForword;
             floorForword = floorOnRuning;
             floorOnRuning = t;

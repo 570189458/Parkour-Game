@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 4687866178854400577}
   - component: {fileID: 4687866178854400582}
   - component: {fileID: 4687866178854400583}
+  - component: {fileID: 8725847185420580551}
   m_Layer: 0
   m_Name: CoinCollect
   m_TagString: Untagged
@@ -4757,6 +4758,19 @@ ParticleSystemRenderer:
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
   m_MaskInteraction: 0
+--- !u!114 &8725847185420580551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4687866178854400580}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aad86452168a5f04196b4a207abb6328, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DestoryTime: 0.5
 --- !u!1 &4687866179552495736
 GameObject:
   m_ObjectHideFlags: 0

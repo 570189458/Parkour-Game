@@ -21,6 +21,8 @@ public enum Position
 public class PlayerControl : MonoBehaviour
 {
     public float speed;
+    public float jumpValue;
+    public float gravity;
     public InputDirection inputDirection;
     public Position standPosition;
     public Position fromPosition;
@@ -29,9 +31,14 @@ public class PlayerControl : MonoBehaviour
     Vector3 xDirection;
     Vector3 moveDirection;
     CharacterController characterController;
+    public bool canDoubleJumo = false;
+    bool DoubleJump = false;
+
+    public static PlayerControl _instance;
     // Start is called before the first frame update
     void Start()
     {
+        _instance = this;
         characterController = GetComponent<CharacterController>();
         StartCoroutine(UpdateAction());
         standPosition = Position.Middle;
@@ -42,7 +49,7 @@ public class PlayerControl : MonoBehaviour
     {
         //transform.Translate(new Vector3(0, 0, speed*Time.deltaTime));
         moveDirection.z = speed;
-
+        moveDirection.y -= gravity * Time.deltaTime;
         characterController.Move((xDirection * 5 + moveDirection) * Time.deltaTime);
     }
 
@@ -53,8 +60,76 @@ public class PlayerControl : MonoBehaviour
             GetInputDirection();
             //PlayerAnimation();
             MoveLeftRight();
+            MoveForward();
             yield return 0;
         }
+    }
+
+    void MoveForward()
+    {
+        if(inputDirection==InputDirection.Down)
+        {
+            AnimationManager._instance.animationHandler = AnimationManager._instance.PlayRoll;
+        }
+        if(characterController.isGrounded)
+        {
+            moveDirection = Vector3.zero;
+            if(AnimationManager._instance.animationHandler != AnimationManager._instance.PlayRoll&&
+                AnimationManager._instance.animationHandler != AnimationManager._instance.PlayTurnLeft&&
+                AnimationManager._instance.animationHandler != AnimationManager._instance.PlayTurnRight)
+            {
+                AnimationManager._instance.animationHandler = AnimationManager._instance.PlayRun;
+            }
+            if(inputDirection==InputDirection.Up)
+            {
+                JumpUp();
+                if(canDoubleJumo)
+                {
+                    DoubleJump = true;
+                }
+            }
+
+        }
+        else
+        {
+            if(inputDirection==InputDirection.Down)
+            {
+                QuickGround();
+            }
+            if(inputDirection==InputDirection.Up)
+            {
+                if(DoubleJump)
+                {
+                    JumpDouble();
+                    DoubleJump = false;
+                }
+            }
+            if(AnimationManager._instance.animationHandler != AnimationManager._instance.PlayJumpUp
+                && AnimationManager._instance.animationHandler != AnimationManager._instance.PlayRoll
+                && AnimationManager._instance.animationHandler != AnimationManager._instance.PlayDoubleJump)
+            {
+                AnimationManager._instance.animationHandler = AnimationManager._instance.PlayJumpLoop;
+            }
+
+        }
+    }
+
+    void QuickGround()
+    {
+        moveDirection.y -= jumpValue * 3;
+    }
+
+    void JumpDouble()
+    {
+        AnimationManager._instance.animationHandler = AnimationManager._instance.PlayDoubleJump;
+        moveDirection.y += jumpValue * 1.3f;
+    }
+
+    void JumpUp()
+    {
+        AnimationManager._instance.animationHandler = AnimationManager._instance.PlayJumpUp;
+
+        moveDirection.y += jumpValue;
     }
 
     public void MoveLeft()
