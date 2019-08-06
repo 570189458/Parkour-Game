@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public enum InputDirection
 {
@@ -21,6 +22,7 @@ public enum Position
 public class PlayerControl : MonoBehaviour
 {
     public float speed;
+    public float init_speed;
     public float jumpValue;
     public float gravity;
     public InputDirection inputDirection;
@@ -31,14 +33,44 @@ public class PlayerControl : MonoBehaviour
     Vector3 xDirection;
     Vector3 moveDirection;
     CharacterController characterController;
+    public bool isRoll = false;
+
     public bool canDoubleJumo = false;
     bool DoubleJump = false;
+    bool isQuickMove = false;
+    float saveSpeed;
+    float quickMoveDuration = 3;
+    public float quickMoveTimeLeft;
+    IEnumerator quickMoveCor;
+
+    float magnetDuration = 15;
+    public float magnetTimeLeft;
+    IEnumerator magnetCor;
+    public GameObject MagnetCollider;
+
+    float shoeDuration = 10;
+    public float shoeTimeLeft;
+    IEnumerator shoeCor;
+
+    float multiplyDuration = 10;
+    public float mulipltTimeLeft;
+    IEnumerator multiplyCor;
+
+    //public Text statusText;
+    public Text Text_Magnet;
+    public Text Text_Shoe;
+    public Text Text_Star;
+    public Text Text_Double;
 
     public static PlayerControl _instance;
+
+    public Animation anim;
     // Start is called before the first frame update
     void Start()
     {
         _instance = this;
+        init_speed = 5;
+        anim = GetComponent<Animation>();
         characterController = GetComponent<CharacterController>();
         StartCoroutine(UpdateAction());
         standPosition = Position.Middle;
@@ -47,22 +79,54 @@ public class PlayerControl : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //transform.Translate(new Vector3(0, 0, speed*Time.deltaTime));
-        moveDirection.z = speed;
-        moveDirection.y -= gravity * Time.deltaTime;
-        characterController.Move((xDirection * 5 + moveDirection) * Time.deltaTime);
+        
+
+        //statusText.text = GetTime(shoeTimeLeft);
+        UpdateItemTime();
+    }
+
+    private void UpdateItemTime()
+    {
+        Text_Magnet.text = GetTime(magnetTimeLeft);
+        Text_Shoe.text = GetTime(shoeTimeLeft);
+        Text_Star.text = GetTime(quickMoveTimeLeft);
+        Text_Double.text = GetTime(mulipltTimeLeft);
+    }
+
+    private string GetTime(float time)
+    {
+        if (time <= 0)
+            return "";
+        //return Mathf.RoundToInt(time).ToString();
+        return ((int)time+1).ToString()+"s";
     }
 
     IEnumerator UpdateAction()
     {
-        while (true)
+        while (GameAttribute._instance.life>0)
         {
-            GetInputDirection();
-            //PlayerAnimation();
-            MoveLeftRight();
-            MoveForward();
+            if (GameController._instance.isPlay && !GameController._instance.isPause)
+            {
+                GetInputDirection();
+                //PlayerAnimation();
+                MoveLeftRight();
+                MoveForward();
+            }
+            else
+            {
+                anim.Stop();
+            }
             yield return 0;
         }
+        Debug.Log("GameOver");
+        speed = 0;
+        GameController._instance.isPlay = false;
+        AnimationManager._instance.animationHandler = AnimationManager._instance.PlayDead;
+        yield return new WaitForSeconds(3);
+        Debug.Log("Restart");
+
+        UIController._instance.ShowRestartUI();
+        UIController._instance.HidePauseUI();
     }
 
     void MoveForward()
@@ -112,6 +176,40 @@ public class PlayerControl : MonoBehaviour
             }
 
         }
+
+        //transform.Translate(new Vector3(0, 0, speed*Time.deltaTime));
+        moveDirection.z = speed;
+        moveDirection.y -= gravity * Time.deltaTime;
+        characterController.Move((xDirection * 5 + moveDirection) * Time.deltaTime);
+    }
+
+    public void Play()
+    {
+        GameController._instance.isPause = false;
+        GameController._instance.isPlay = true;
+        StartCoroutine(UpdateAction());
+    }
+
+    public void ResetAll()
+    {
+        speed = init_speed;
+        inputDirection = InputDirection.None;
+        activeInput = false;
+        standPosition = Position.Middle;
+        xDirection = Vector3.zero;
+        moveDirection = Vector3.zero;
+        isRoll = false;
+        canDoubleJumo = false;
+        isQuickMove = false;
+        quickMoveTimeLeft = 0;
+        magnetTimeLeft = 0;
+        shoeTimeLeft = 0;
+        mulipltTimeLeft = 0;
+
+        gameObject.transform.position = new Vector3(0, 0, -64);
+        Camera.main.transform.position = new Vector3(0, 5, -70);
+        Debug.Log("Reset");
+        AnimationManager._instance.animationHandler = AnimationManager._instance.PlayRun;
     }
 
     void QuickGround()
@@ -243,6 +341,107 @@ public class PlayerControl : MonoBehaviour
         {
             AnimationManager._instance.animationHandler = AnimationManager._instance.PlayRoll;
         }
+    }
+
+
+
+    public void QuickMove()
+    {
+        if (quickMoveCor != null)
+            StopCoroutine(quickMoveCor);
+        quickMoveCor = QuickMoveCoroutine();
+        StartCoroutine(quickMoveCor);
+    }
+
+    public void UseMagnet()
+    {
+        if(magnetCor!=null)
+        {
+            StopCoroutine(magnetCor);
+        }
+        magnetCor = MagnetCoroutine();
+        StartCoroutine(magnetCor);
+    }
+
+    public void UseShoe()
+    {
+        if(shoeCor!=null)
+        {
+            StopCoroutine(shoeCor);
+        }
+        shoeCor = ShoeCoroutine();
+        StartCoroutine(shoeCor);
+    }
+
+    public void Multiply()
+    {
+        if(multiplyCor!=null)
+        {
+            StopCoroutine(multiplyCor);
+        }
+        multiplyCor = MultiplyCoroutine();
+        StartCoroutine(multiplyCor);
+    }
+
+    private bool CanPlay()
+    {
+        return !GameController._instance.isPause && GameController._instance.isPlay;
+    }
+
+    IEnumerator MultiplyCoroutine()
+    {
+        mulipltTimeLeft = multiplyDuration;
+        GameAttribute._instance.multiply = 2;
+        while(mulipltTimeLeft>=0)
+        {
+            if(CanPlay())
+                mulipltTimeLeft -= Time.deltaTime;
+            yield return null;
+        }
+        GameAttribute._instance.multiply = 1;
+    }
+
+    IEnumerator ShoeCoroutine()
+    {
+        shoeTimeLeft = shoeDuration;
+        PlayerControl._instance.canDoubleJumo = true;
+        while(shoeTimeLeft>=0)
+        {
+            if (CanPlay())
+                shoeTimeLeft -= Time.deltaTime;
+            yield return null;
+        }
+        PlayerControl._instance.canDoubleJumo = false;
+    }
+
+    IEnumerator MagnetCoroutine()
+    {
+        magnetTimeLeft = magnetDuration;
+        MagnetCollider.SetActive(true);
+        while(magnetTimeLeft>=0)
+        {
+            if (CanPlay())
+                magnetTimeLeft -= Time.deltaTime;
+            yield return null;
+        }
+        MagnetCollider.SetActive(false);
+    }
+
+    IEnumerator QuickMoveCoroutine()
+    {
+        quickMoveTimeLeft = quickMoveDuration;
+        if(isQuickMove==false)
+            saveSpeed = speed;
+        speed = 20;
+        isQuickMove = true;
+        //yield return new WaitForSeconds(quickMoveDuration);
+        while(quickMoveTimeLeft>=0)
+        {
+            if (CanPlay())
+                quickMoveTimeLeft -= Time.deltaTime;
+            yield return null;
+        }
+        speed = saveSpeed;
     }
 
     public void GetInputDirection()

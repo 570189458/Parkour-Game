@@ -25,9 +25,14 @@ public class CameraManager : MonoBehaviour
     private void LateUpdate()
     {
         //pos.x = Mathf.Lerp(pos.x, target.transform.position.x, Time.deltaTime * 5);
-        pos.x = target.transform.position.x;
-        pos.y = Mathf.Lerp(pos.y, target.transform.position.y + height, Time.deltaTime * 5);
-        pos.z = Mathf.Lerp(pos.z, target.transform.position.z - distance, Time.deltaTime * 5);
-        transform.position = pos;
+
+        if (GameController._instance.isPlay && !GameController._instance.isPause)
+        {
+            pos.x = target.transform.position.x;
+            pos.y = Mathf.Lerp(pos.y, target.transform.position.y + height, Time.deltaTime * 5);
+            //pos.z = Mathf.Lerp(pos.z, target.transform.position.z - distance, Time.deltaTime * 5);
+            pos.z = target.transform.position.z - distance;
+            transform.position = pos;
+        }
     }
 }

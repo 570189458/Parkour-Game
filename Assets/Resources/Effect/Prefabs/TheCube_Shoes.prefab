@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 2485776835793057808}
   - component: {fileID: 2485776835793057809}
   - component: {fileID: 2485776835793057810}
+  - component: {fileID: 1696977613809781448}
   m_Layer: 0
   m_Name: TheCube_Shoes
   m_TagString: Untagged
@@ -114,7 +115,7 @@ ParticleSystem:
     enabled: 1
     startLifetime:
       serializedVersion: 2
-      minMaxState: 3
+      minMaxState: 0
       scalar: 0.8
       minScalar: 0.1
       maxCurve:
@@ -4756,3 +4757,16 @@ ParticleSystemRenderer:
   m_Mesh2: {fileID: 0}
   m_Mesh3: {fileID: 0}
   m_MaskInteraction: 0
+--- !u!114 &1696977613809781448
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2485776835793057811}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aad86452168a5f04196b4a207abb6328, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  DestoryTime: 0
