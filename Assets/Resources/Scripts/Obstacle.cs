@@ -10,7 +10,7 @@ public class Obstacle : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        
+         
     }
 
     // Update is called once per frame
@@ -24,6 +24,8 @@ public class Obstacle : MonoBehaviour
     {
         if(other.tag=="Player")
         {
+            AudioManager._instance.PlayHitAudio();
+            CameraManager._instance.CameraShake();
             GameAttribute._instance.life -= hurtValue;
         }
         if (other.tag != "Road" && other.tag != "MagnetCollider")

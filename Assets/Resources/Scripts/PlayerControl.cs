@@ -23,6 +23,10 @@ public class PlayerControl : MonoBehaviour
 {
     public float speed;
     public float init_speed;
+    private float maxSpeed = 10;
+    private float speedAddDistance = 100;
+    private float speedAddRate = 0.5f;
+    private float speedAddCount;
     public float jumpValue;
     public float gravity;
     public InputDirection inputDirection;
@@ -101,16 +105,40 @@ public class PlayerControl : MonoBehaviour
         return ((int)time+1).ToString()+"s";
     }
 
+    private void SetSpeed(float newSpeed)
+    {
+        if(newSpeed<=maxSpeed)
+        {
+            speed = newSpeed;
+        }
+        else
+        {
+            speed = maxSpeed;
+        }
+    }
+
+    private void UpdateSpeed()
+    {
+        speedAddCount += speed * Time.deltaTime;
+        if(speedAddCount>=speedAddDistance)
+        {
+            SetSpeed(speed + speedAddRate);
+            speedAddCount = 0;
+        }
+    }
+
     IEnumerator UpdateAction()
     {
         while (GameAttribute._instance.life>0)
         {
             if (GameController._instance.isPlay && !GameController._instance.isPause)
             {
+                
                 GetInputDirection();
                 //PlayerAnimation();
                 MoveLeftRight();
                 MoveForward();
+                UpdateSpeed();
             }
             else
             {
@@ -123,8 +151,6 @@ public class PlayerControl : MonoBehaviour
         GameController._instance.isPlay = false;
         AnimationManager._instance.animationHandler = AnimationManager._instance.PlayDead;
         yield return new WaitForSeconds(3);
-        Debug.Log("Restart");
-
         UIController._instance.ShowRestartUI();
         UIController._instance.HidePauseUI();
     }
@@ -461,18 +487,22 @@ public class PlayerControl : MonoBehaviour
                 var angleX = Mathf.Acos(Vector3.Dot(vec.normalized, Vector3.right)) * Mathf.Rad2Deg;
                 if (angleY <= 45)
                 {
+                    AudioManager._instance.PlaySlideAudio();
                     inputDirection = InputDirection.Up;
                 }
                 else if (angleY >= 135)
                 {
+                    AudioManager._instance.PlaySlideAudio();
                     inputDirection = InputDirection.Down;
                 }
                 else if (angleX <= 45)
                 {
+                    AudioManager._instance.PlaySlideAudio();
                     inputDirection = InputDirection.Right;
                 }
                 else if (angleX >= 135)
                 {
+                    AudioManager._instance.PlaySlideAudio();
                     inputDirection = InputDirection.Left;
                 }
                 activeInput = false;

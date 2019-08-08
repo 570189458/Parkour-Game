@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class GameController : MonoBehaviour
 {
@@ -35,9 +36,11 @@ public class GameController : MonoBehaviour
 
     public void Restart()
     {
-        GameAttribute._instance.ResetAll();
-        PlayerControl._instance.ResetAll();
-        PlayerControl._instance.Play();
+        SceneManager.LoadScene(0);
+        
+        //GameAttribute._instance.ResetAll();
+        //PlayerControl._instance.ResetAll();
+        //PlayerControl._instance.Play();
     }
 
     public void Exit()

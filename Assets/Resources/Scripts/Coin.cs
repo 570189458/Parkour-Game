@@ -9,4 +9,9 @@ public class Coin : Item
         base.HitItem();
         GameAttribute._instance.AddCoin(1);
     }
+
+    public override void PlayHitAudio()
+    {
+        AudioManager._instance.PlayCoinAudio();
+    }
 }

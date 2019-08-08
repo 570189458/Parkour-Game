@@ -20,10 +20,16 @@ public class Item : MonoBehaviour
 
     public virtual void HitItem()
     {
+        PlayHitAudio();
         GameObject go = Instantiate(hitEffect);
         go.transform.parent = PlayerControl._instance.transform;
         go.transform.localPosition = new Vector3(0, 0.5f, 0);
         Destroy(gameObject);
+    }
+
+    public virtual void PlayHitAudio()
+    {
+        AudioManager._instance.PlayGetItemsAudio();
     }
 
     public virtual void OnTriggerEnter(Collider other)

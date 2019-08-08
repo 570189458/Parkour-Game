@@ -16,6 +16,8 @@ public class GameAttribute : MonoBehaviour
 
     public Text Text_Coin;
 
+    public bool SoundOn = true;
+
     // Start is called before the first frame update
     void Start()
     {

@@ -33,6 +33,7 @@ public class UIController : MonoBehaviour
     {
         HidePlayUI();
         ShowPauseUI();
+        AudioManager._instance.PlayButtonAudio();
         GameController._instance.Play();
     }
 
@@ -65,6 +66,7 @@ public class UIController : MonoBehaviour
     {
         ShowResumeUI();
         HidePauseUI();
+        AudioManager._instance.PlayButtonAudio();
         GameController._instance.Pause();
     }
 
@@ -72,18 +74,22 @@ public class UIController : MonoBehaviour
     {
         HideResumeUI();
         ShowPauseUI();
+        AudioManager._instance.PlayButtonAudio();
         GameController._instance.Resume();
     }
 
     public void RestartHandler()
     {
+
         HideRestartUI();
         ShowPauseUI();
+        AudioManager._instance.PlayButtonAudio();
         GameController._instance.Restart();
     }
 
     public void ExitHandler()
     {
+        AudioManager._instance.PlayButtonAudio();
         GameController._instance.Exit();
     }
 
